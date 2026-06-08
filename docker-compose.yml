@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: dockerfile.api
+    container_name: skin_disease_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./model:/app/model
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: dockerfile.ui
+    container_name: skin_disease_ui
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
+    restart: unless-stopped

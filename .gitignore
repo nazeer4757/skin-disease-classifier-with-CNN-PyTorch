@@ -1,0 +1,32 @@
+# virtual environment
+venv/
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# model weights (too large for git)
+model/best_model.pt
+
+# environment variables
+.env
+
+# VS Code
+.vscode/
+
+# jupyter checkpoints
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# mlflow
+mlruns/
+
+# docker
+*.log
