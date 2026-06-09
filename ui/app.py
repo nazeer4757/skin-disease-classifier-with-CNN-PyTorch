@@ -4,9 +4,10 @@ import requests
 from PIL import Image
 import io
 import plotly.graph_objects as go
+import os
 
 # config
-API_URL = "http://localhost:8000"
+API_URL = os.getenv("API_URL", "http://api:8000")
 CLASS_LABELS = {
     'nv'   : 'Melanocytic Nevi (Mole)',
     'mel'  : 'Melanoma',

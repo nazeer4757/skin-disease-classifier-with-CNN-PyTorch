@@ -2,11 +2,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# install dependencies
 COPY api/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# copy api code
+RUN pip install --no-cache-dir torch torchvision \
+    --index-url https://download.pytorch.org/whl/cpu && \
+    pip install --no-cache-dir fastapi==0.136.3 \
+    uvicorn==0.34.3 python-multipart==0.0.20 pillow numpy
+
 COPY api/ ./api/
 COPY model/ ./model/
 

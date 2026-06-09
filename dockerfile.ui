@@ -2,11 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# install dependencies
 COPY ui/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
 
-# copy ui code
+RUN pip install --no-cache-dir streamlit==1.58.0 requests pillow numpy plotly
+
 COPY ui/ ./ui/
 
 WORKDIR /app/ui
