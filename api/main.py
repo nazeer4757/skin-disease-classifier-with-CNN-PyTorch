@@ -5,25 +5,28 @@ from contextlib import asynccontextmanager
 from PIL import Image
 import io
 
-from model import load_model, predict, CLASS_NAMES, DEVICE
+from model import load_model, load_gatekeeper_models, predict, CLASS_NAMES, DEVICE
 from schemas import PredictionResponse, HealthResponse
 
-# global model variable
-ml_model = None
+# global model variables
+ml_model   = None
+gatekeeper = None   # NEW
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # load model once at startup
-    global ml_model
-    ml_model = load_model()
+    # load models once at startup
+    global ml_model, gatekeeper
+    ml_model   = load_model()
+    gatekeeper = load_gatekeeper_models()   # NEW
     yield
     # cleanup on shutdown
-    ml_model = None
+    ml_model   = None
+    gatekeeper = None
 
 app = FastAPI(
     title       = "Skin Disease Classifier API",
     description = "EfficientNet-B4 trained on HAM10000 — 7 skin disease classes",
-    version     = "1.0.0",
+    version     = "1.1.0",   # bumped — gatekeeper added
     lifespan    = lifespan
 )
 
@@ -74,6 +77,6 @@ async def predict_image(file: UploadFile = File(...)):
             detail      = "Invalid image file"
         )
 
-    # predict
-    result = predict(ml_model, image)
+    # predict — NEW: gatekeeper passed in, runs before skin model
+    result = predict(ml_model, image, gatekeeper=gatekeeper)
     return result

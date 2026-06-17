@@ -101,10 +101,30 @@ with col2:
                     timeout=30
                 )
                 result = response.json()
+                status = result.get("status", "success")  # NEW
 
-                if result["is_unknown"]:
+                # ── NEW: handle gatekeeper rejections first ────────────
+                if status == "rejected_human":
+                    st.warning(f"🧑 {result['message']}")
+                    st.caption(
+                        "Tip: take a close-up photo of just the affected "
+                        "skin patch, not your face or full body."
+                    )
+
+                elif status == "rejected_invalid":
+                    st.warning(f"📷 {result['message']}")
+                    st.caption(
+                        "Tip: upload a clear, close-up photo of the "
+                        "skin lesion you'd like analyzed."
+                    )
+
+                # ── EXISTING: unknown / low-confidence skin image ───────
+                elif result["is_unknown"]:
                     st.error("⚪ Unknown — not a recognized skin lesion")
-                    st.metric("Confidence", f"{result['confidence']:.1%}")
+                    if result.get("confidence") is not None:
+                        st.metric("Confidence", f"{result['confidence']:.1%}")
+
+                # ── EXISTING: successful prediction — unchanged ─────────
                 else:
                     cls      = result["predicted_class"]
                     label    = result["label"]
@@ -145,7 +165,7 @@ with col2:
                     # medical info
                     with st.expander("ℹ️ About this condition"):
                         info = {
-                            'nv'   : "Melanocytic nevi are common benign moles. Usually harmless but monitor for changes in size, shape or color.",
+                            'nv'   : "Melanocytic nevi are common begining moles. Usually harmless but monitor for changes in size, shape or color.",
                             'mel'  : "Melanoma is the most serious skin cancer. Early detection is critical — please consult a dermatologist immediately.",
                             'bkl'  : "Benign keratosis are non-cancerous skin growths. Generally harmless but can be removed for cosmetic reasons.",
                             'bcc'  : "Basal cell carcinoma is the most common skin cancer. Grows slowly and rarely spreads — highly treatable if caught early.",
